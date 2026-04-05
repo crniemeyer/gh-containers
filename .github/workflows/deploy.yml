@@ -30,6 +30,18 @@ jobs:
       - name: Debuging password
         run: |
           echo "debug... MONGODB_USERNAME: $MONGODB_USERNAME"
+      - name: Test MongoDB connection
+        run: |
+          npm install mongodb
+          node -e "
+            const { MongoClient } = require('mongodb');
+            const uri = 'mongodb+srv://${{ secrets.MONGODB_USERNAME }}:${{ secrets.MONGODB_PASSWORD }}@cluster0.vyxyzah.mongodb.net/${{ env.MONGODB_DB_NAME }}?retryWrites=true&w=majority';
+            const client = new MongoClient(uri);
+            client.connect()
+              .then(() => console.log('✅ Connected to MongoDB!'))
+              .catch(err => { console.error('❌ Connection failed', err); process.exit(1); })
+              .finally(() => client.close());
+          "
       - name: Run server
         run: npm start & npx wait-on http://127.0.0.1:$PORT # requires MongoDB Atlas to accept requests from anywhere!
       - name: Run tests
