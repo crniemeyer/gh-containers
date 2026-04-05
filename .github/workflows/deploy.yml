@@ -35,7 +35,7 @@ jobs:
           npm install mongodb
           node -e '
             const { MongoClient } = require("mongodb");
-            const uri = `mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@cluster0.vyxyzah.mongodb.net/${process.env.MONGODB_DB_NAME}?retryWrites=true&w=majority`;
+            const uri = `mongodb+srv://${encodeURIComponent(process.env.MONGODB_USERNAME)}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_CLUSTER_ADDRESS}/${process.env.MONGODB_DB_NAME}?authSource=admin&retryWrites=true&w=majority`;
             console.log("Trying to connect to MongoDB...");
             const client = new MongoClient(uri);
             client.connect()
