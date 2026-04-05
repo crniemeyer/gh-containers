@@ -19,30 +19,14 @@ jobs:
       PORT: 8080
     steps:
       - name: Get Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Cache dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ env.CACHE_KEY }}-${{ hashFiles('**/package-lock.json') }}
       - name: Install dependencies
         run: npm ci
-      - name: Debuging password
-        run: |
-          echo "debug... MONGODB_USERNAME: $MONGODB_USERNAME"
-      - name: Test MongoDB connection
-        run: |
-          npm install mongodb
-          node -e '
-            const { MongoClient } = require("mongodb");
-            const uri = `mongodb+srv://${encodeURIComponent(process.env.MONGODB_USERNAME)}:${encodeURIComponent(process.env.MONGODB_PASSWORD)}@${process.env.MONGODB_CLUSTER_ADDRESS}/${process.env.MONGODB_DB_NAME}?authSource=admin&retryWrites=true&w=majority`;
-            console.log("Trying to connect to MongoDB...");
-            const client = new MongoClient(uri);
-            client.connect()
-              .then(() => console.log("✅ Connected to MongoDB!"))
-              .catch(err => { console.error("❌ Connection failed", err); process.exit(1); })
-              .finally(() => client.close());
-          '
       - name: Run server
         run: npm start & npx wait-on http://127.0.0.1:$PORT # requires MongoDB Atlas to accept requests from anywhere!
       - name: Run tests
